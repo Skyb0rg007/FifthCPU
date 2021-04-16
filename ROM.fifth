@@ -1,0 +1,25 @@
+\ vim: set ft=forth:
+
+: +      N+T   d-1  alu ;
+: noop   T          alu ;
+: xor    N^T   d-1  alu ;
+: and    N&T   d-1  alu ;
+: or     N|T   d-1  alu ;
+: invert ~T         alu ;
+: =      N==T  d-1  alu ;
+: <      N<T   d-1  alu ;
+: swap   N     T->N alu ;
+
+\ $20 $30 swap invert + noop noop noop
+T alu
+\ T d-1 alu
+$20 imm
+$30 imm
+N T->N  alu \ swap
+~T      alu \ invert
+T       alu \ noop
+N+T d-1 alu \ +
+T       alu
+T       alu
+T       alu
+

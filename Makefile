@@ -1,31 +1,28 @@
 
-VHDL = ghdl
-VHDLFLAGS = --std=08
+IVERILOG = iverilog
+VVP = vvp
 RM = rm -f
+GTKWAVE = gtkwave
+GFORTH = gforth
 
-check:
-	$(VHDL) -s $(VHDLFLAGS) common.vhdl stack.vhdl j1.vhdl j1_test.vhdl
+.DEFAULT: all
+.PHONY: clean
+
+all: fifth
 
 clean:
-	$(VHDL) --clean
-	$(RM) j1_test testbench.vcd
+	$(RM) fifth fifth.vcd ROM.hex
 
-%.o: %.vhdl
-	$(VHDL) -a $(VHDLFLAGS) $<
+fifth: fifth.v fifth_tb.v ROM.hex
+	@#$(IVERILOG) -o fifth j1.v fifth_tb.v
+	$(IVERILOG) -s fifth_tb -o fifth fifth.v fifth_tb.v
 
-j1_test: common.o stack.o j1.o j1_test.o
-	$(VHDL) -e $(VHDLFLAGS) j1_test
+fifth.vcd: fifth
+	$(VVP) fifth
 
-testbench.vcd: j1_test
-	$(VHDL) -r j1_test --vcd=$@
+wave: fifth.vcd
+	$(GTKWAVE) fifth.vcd >/dev/null 2>&1
 
-waveform: testbench.vcd
-	gtkwave $< >/dev/null 2>&1
+ROM.hex: compile.fs ROM.fifth
+	$(GFORTH) compile.fs > ROM.hex
 
-$(BUILDDIR):
-	@mkdir -p $@
-
-# Dependencies
-stack.o: common.o
-j1.o: common.o stack.o
-j1_test.o: j1.o

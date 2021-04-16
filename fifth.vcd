@@ -1,0 +1,229 @@
+$date
+	Thu Apr 15 23:35:40 2021
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1ps
+$end
+$scope module fifth_tb $end
+$scope module cpu $end
+$var wire 1 ! clk $end
+$var wire 16 " instruction [15:0] $end
+$var wire 16 # mem_address [15:0] $end
+$var wire 16 $ mem_data_input [15:0] $end
+$var wire 16 % mem_data_output [15:0] $end
+$var wire 1 & mem_write_enable $end
+$var wire 1 ' reset $end
+$var wire 16 ( rstack_write_data [15:0] $end
+$var wire 13 ) code_addr [12:0] $end
+$var wire 16 * R [15:0] $end
+$var wire 16 + N [15:0] $end
+$var reg 16 , T [15:0] $end
+$var reg 16 - T_next [15:0] $end
+$var reg 4 . dsp [3:0] $end
+$var reg 4 / dsp_delta [3:0] $end
+$var reg 4 0 dsp_next [3:0] $end
+$var reg 1 1 dstack_write_enable $end
+$var reg 13 2 pc [12:0] $end
+$var reg 13 3 pc_next [12:0] $end
+$var reg 1 4 reboot $end
+$var reg 4 5 rsp [3:0] $end
+$var reg 4 6 rsp_delta [3:0] $end
+$var reg 4 7 rsp_next [3:0] $end
+$var reg 1 8 rstack_write_enable $end
+$scope module dstack $end
+$var wire 1 ! clk $end
+$var wire 4 9 read_addr [3:0] $end
+$var wire 16 : read_data [15:0] $end
+$var wire 4 ; write_addr [3:0] $end
+$var wire 16 < write_data [15:0] $end
+$var wire 1 1 write_enable $end
+$upscope $end
+$scope module rstack $end
+$var wire 1 ! clk $end
+$var wire 4 = read_addr [3:0] $end
+$var wire 16 > read_data [15:0] $end
+$var wire 4 ? write_addr [3:0] $end
+$var wire 16 @ write_data [15:0] $end
+$var wire 1 8 write_enable $end
+$upscope $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+#0
+$dumpvars
+b0 @
+b0 ?
+bx >
+b0 =
+b0 <
+b0 ;
+bx :
+b0 9
+08
+b0 7
+b0 6
+b0 5
+14
+b0 3
+b0 2
+01
+b0 0
+b0 /
+b0 .
+b0 -
+b0 ,
+bx +
+bx *
+b0 )
+b0 (
+0'
+0&
+bz %
+bx $
+b0 #
+b110000000000000 "
+1!
+$end
+#1000
+1'
+#5000
+0!
+#10000
+b1100000000000010 (
+b1100000000000010 @
+b100000 #
+b100000 -
+b1000000000100000 "
+b1 )
+b1 3
+04
+1!
+#15000
+0!
+#20000
+b110000 #
+b110000 -
+b1000000000110000 "
+b10 )
+b10 3
+b1 0
+b1 ;
+11
+b1 /
+b1100000000000100 (
+b1100000000000100 @
+b100000 ,
+b100000 <
+b1 2
+1!
+#25000
+0!
+#30000
+b100000 #
+b100000 -
+b110000101000000 "
+b11 )
+b11 3
+b10 0
+b10 ;
+b110000 (
+b110000 @
+b100000 +
+b100000 :
+b110000 ,
+b110000 <
+b1 .
+b1 9
+b10 2
+1!
+#35000
+0!
+#40000
+b100000 (
+b100000 @
+b1111111111011111 #
+b1111111111011111 -
+b110011000000000 "
+b100 )
+b100 3
+b0 /
+b100000 ,
+b100000 <
+b110000 +
+b110000 :
+b10 .
+b10 9
+b11 2
+1!
+#45000
+0!
+#50000
+b1111111111011111 (
+b1111111111011111 @
+b110000000000000 "
+b101 )
+b101 3
+01
+b100000 +
+b100000 :
+b1111111111011111 ,
+b1111111111011111 <
+b100 2
+1!
+#55000
+0!
+#60000
+b1111111111111111 #
+b1111111111111111 -
+b110001000000011 "
+b110 )
+b110 3
+b101 2
+1!
+#65000
+0!
+#70000
+b1111111111111111 (
+b1111111111111111 @
+b110000000000000 "
+b111 )
+b111 3
+b1 0
+b1 ;
+b1111 /
+b1111111111111111 ,
+b1111111111111111 <
+b110 2
+1!
+#75000
+0!
+#80000
+b1000 )
+b1000 3
+b0 /
+b1 .
+b1 9
+b111 2
+1!
+#85000
+0!
+#90000
+b1001 )
+b1001 3
+b1000 2
+1!
+#95000
+0!
+#100000
+b1010 )
+b1010 3
+b1001 2
+1!
+#105000
+0!
+#110000
+b1010 2
+1!

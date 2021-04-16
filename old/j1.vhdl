@@ -13,7 +13,7 @@ entity j1 is
              -- io_data_input:   in  common.word;
              -- io_data_output:  out common.word;
              instruction:     in  common.word;
-             code_address:    out common.address;
+             code_address:    out common.address
          );
 end entity;
 
@@ -71,40 +71,24 @@ begin
         elsif instruction(14 downto 13) = "11" then
             -- ALU operation
             case instruction(11 downto 8) is
-                -- T := T
                 when "0000" => T_next <= T;
-                -- T := N
                 when "0001" => T_next <= N;
-                -- T := N + T
                 when "0010" => T_next <= common.word(unsigned(N) + unsigned(T));
-                -- T := T & N
                 when "0011" => T_next <= N and T;
-                -- T := T | N
                 when "0100" => T_next <= N or T;
-                -- T := T ^ N
                 when "0101" => T_next <= N xor T;
-                -- T := ~T
                 when "0110" => T_next <= not T;
-                -- T := N == T
                 when "0111" => T_next <= (others => N ?= T);
-                -- T := N < T
                 when "1000" => T_next <= (others => signed(N) ?< signed(T));
-                -- T := N >> T
                 when "1001" => T_next <= common.word(unsigned(N) srl to_integer(unsigned(T(4 downto 0))));
-                -- T := N << T
                 when "1010" => T_next <= common.word(unsigned(N) sll to_integer(unsigned(T(4 downto 0))));
-                -- T := R
                 when "1011" => T_next <= R;
-                -- T := *T
                 -- when "1100" =>
-                -- T := IO/T
                 -- when "1101" =>
-                -- T := (rdepth << 4) | depth
                 when "1110" =>
                     T_next(15 downto 8) <= (others => '0');
                     T_next(7 downto 4) <= std_ulogic_vector(rsp);
                     T_next(3 downto 0) <= std_ulogic_vector(dsp);
-                -- T := N u< T
                 when "1111" => T_next <= (others => unsigned(N) ?< unsigned(T));
                 when others =>
                     T_next <= (others => 'X');
