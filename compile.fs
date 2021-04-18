@@ -1,27 +1,24 @@
 #! /usr/bin/gforth
 \ Cross-compiler for the FIFTH cpu
 
-WARNINGS OFF
+\ GForth warns on redefinition
+warnings off
 
-\ ROM creation
-1024 16 * CONSTANT rom-size
-CREATE rom   rom-size ALLOT 
-VARIABLE there  rom there !
-\ Fill ROM with noops
-:NONAME rom-size 0 DO $6000 rom I + w!  16 +LOOP ; EXECUTE
+VARIABLE num-instructions  0 num-instructions !
 
-\ Helpers for accessing ROM
-: t@  uw@ ; \ Access 16-bit value at address, zero-extending
-: t!  w! ;  \ Store 16-bit value at address
-: t,  there @ t! 16 there +! ; \ Store 16-bit value, incrementing 'there'
-: t.  BASE @ >R HEX S>D <# # # # # #> TYPE R> BASE ! ;
-: dump-rom ( -- )
-    \ Print ROM in hex, 4 bytes per instruction, 8 instructions per line
-    BASE @ HEX
-    rom-size 0 DO
-        rom I + t@ t. CR
-    16 +LOOP
-    BASE ! ;
+: instr. ( instr -- )
+    DUP $ffff U> ABORT" Instruction out of range"
+    BASE @ >R
+    HEX S>D <# # # # # #> TYPE SPACE
+    1 num-instructions +!
+    num-instructions @ $f AND 0= IF
+        CR
+    THEN
+    R> BASE ! ;
+: noop-pad ( -- )
+    1024 num-instructions @ ?DO
+        $6000 instr.
+    LOOP ;
 
 \ Error checking
 : assert-address ( addr -- )
@@ -33,42 +30,49 @@ VARIABLE there  rom there !
 
 \ Compile instructions
 : imm ( n -- )
-    DUP assert-immediate $8000 OR t, ;
+    DUP assert-immediate $8000 OR instr. ;
 : branch ( addr -- )
-    DUP assert-address t, ;
+    DUP assert-address instr. ;
 : 0branch ( addr -- )
-    DUP assert-address $2000 OR t, ;
+    DUP assert-address $2000 OR instr. ;
 : call ( addr -- )
-    DUP assert-address $4000 OR t, ;
+    DUP assert-address $4000 OR instr. ;
 : alu ( x -- )
-    $6000 OR t, ;
+    $6000 OR instr. ;
 
-%0000 8 LSHIFT CONSTANT T
-%0001 8 LSHIFT CONSTANT N
-%0010 8 LSHIFT CONSTANT N+T
-%0011 8 LSHIFT CONSTANT N&T
-%0100 8 LSHIFT CONSTANT N|T
-%0101 8 LSHIFT CONSTANT N^T
-%0110 8 LSHIFT CONSTANT ~T
-%0111 8 LSHIFT CONSTANT N==T
-%1000 8 LSHIFT CONSTANT N<T
-%1001 8 LSHIFT CONSTANT N>>T
-%1010 8 LSHIFT CONSTANT N<<T
-%1011 8 LSHIFT CONSTANT R
-%1100 8 LSHIFT CONSTANT [T]
-%1111 8 LSHIFT CONSTANT Nu<T
+\ 12-8: ALU opcode
+%00000 $8 LSHIFT CONSTANT T
+%00001 $8 LSHIFT CONSTANT N
+%00010 $8 LSHIFT CONSTANT N+T
+%00011 $8 LSHIFT CONSTANT N&T
+%00100 $8 LSHIFT CONSTANT N|T
+%00101 $8 LSHIFT CONSTANT N^T
+%00110 $8 LSHIFT CONSTANT ~T
+%00111 $8 LSHIFT CONSTANT N==T
+%01000 $8 LSHIFT CONSTANT N<T
+%01001 $8 LSHIFT CONSTANT N>>T
+%01010 $8 LSHIFT CONSTANT N<<T
+%01011 $8 LSHIFT CONSTANT R
+%01100 $8 LSHIFT CONSTANT [T]
+%01111 $8 LSHIFT CONSTANT Nu<T
 
-: R->PC  1 7 LSHIFT OR ;
-: T->N   1 6 LSHIFT OR ;
-: T->R   1 5 LSHIFT OR ;
-: N->[T] 1 4 LSHIFT OR ;
+\ 7-4: bits determining special things
+: R->PC  %1  $7 LSHIFT OR ;
+: T->N   %1  $6 LSHIFT OR ;
+: T->R   %1  $5 LSHIFT OR ;
+: N->[T] %1  $4 LSHIFT OR ;
 
-: d-2 %10 OR ;
-: d-1 %11 OR ;
-: d+1 %01 OR ;
-: r-2 %1000 OR ;
-: r-1 %1100 OR ;
-: r+1 %0100 OR ;
+\ 3-2: rstack delta
+: r-2    %10 $2 LSHIFT OR ;
+: r-1    %11 $2 LSHIFT OR ;
+: r+1    %01 $2 LSHIFT OR ;
 
-\ ROM
-:NONAME S" ROM.fifth" INCLUDED dump-rom BYE ; EXECUTE
+\ 1-0: dstack delta
+: d-2    %10 $0 LSHIFT OR ;
+: d-1    %11 $0 LSHIFT OR ;
+: d+1    %01 $0 LSHIFT OR ;
+
+\ Compile the ROM
+next-arg INCLUDED
+noop-pad
+BYE

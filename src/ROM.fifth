@@ -1,0 +1,33 @@
+\ vim: set ft=forth:
+
+: parsing-imm
+    0. PARSE-NAME >NUMBER
+    ABORT" Unable to convert number!" DROP
+    ABORT" Immediate number out of range!" imm ;
+: $
+    ['] parsing-imm #16 base-execute ;
+: #
+    ['] parsing-imm #10 base-execute ;
+: %
+    ['] parsing-imm #2  base-execute ;
+
+: +      N+T   d-1  alu ;
+: noop   T          alu ;
+: xor    N^T   d-1  alu ;
+: and    N&T   d-1  alu ;
+: or     N|T   d-1  alu ;
+: invert ~T         alu ;
+: =      N==T  d-1  alu ;
+: <      N<T   d-1  alu ;
+: swap   N     T->N alu ;
+
+\ $20 $30 swap invert + noop noop noop
+$ 15
+$ 19
+$ 30
+swap
+invert
+noop
++
+noop
+

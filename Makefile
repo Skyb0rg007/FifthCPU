@@ -1,28 +1,45 @@
 
 IVERILOG = iverilog
 VVP = vvp
-RM = rm -f
+VERILATOR = verilator
 GTKWAVE = gtkwave
 GFORTH = gforth
+RM = rm -f
+MKDIR = mkdir -p
+
+BUILDDIR = _build
 
 .DEFAULT: all
-.PHONY: clean
+.PHONY: clean lint wave
 
 all: fifth
 
 clean:
-	$(RM) fifth fifth.vcd ROM.hex
+	$(RM) $(BUILDDIR)/*
 
-fifth: fifth.v fifth_tb.v ROM.hex
-	@#$(IVERILOG) -o fifth j1.v fifth_tb.v
-	$(IVERILOG) -s fifth_tb -o fifth fifth.v fifth_tb.v
+lint:
+	$(VERILATOR) --lint-only -Wall src/fifth.v src/fifth_tb.v
 
-fifth.vcd: fifth
-	$(VVP) fifth
+wave: $(BUILDDIR)/fifth.lxt
+	$(GTKWAVE) $< >/dev/null 2>&1
 
-wave: fifth.vcd
-	$(GTKWAVE) fifth.vcd >/dev/null 2>&1
+dump: $(BUILDDIR)/fifth.lxt
 
-ROM.hex: compile.fs ROM.fifth
-	$(GFORTH) compile.fs > ROM.hex
+fifth: $(BUILDDIR)/fifth.vvp
 
+ROM: $(BUILDDIR)/ROM.hex
+
+
+# Build rules for files
+
+$(BUILDDIR)/fifth.vvp: src/fifth.v src/fifth_tb.v | $(BUILDDIR)
+	$(IVERILOG) -s fifth_tb -o $@ $^
+
+$(BUILDDIR)/fifth.lxt: $(BUILDDIR)/fifth.vvp $(BUILDDIR)/ROM.hex
+	cd $(BUILDDIR) && $(VVP) fifth.vvp -lxt2 
+
+$(BUILDDIR)/ROM.hex: src/ROM.fifth compile.fs | $(BUILDDIR)
+	$(GFORTH) compile.fs $< > $@
+
+$(BUILDDIR):
+	$(MKDIR) $@
